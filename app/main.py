@@ -28,6 +28,14 @@ class InputTelemetry(SQLModel):
     longitude: float = Field(ge=-180, le=180)
     altitude_ft: int = Field(ge=0)
     groundspeed_kt: int = Field(ge=0, le=700)
+
+# Model to send alert data to database
+class Alert(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    icao: str
+    timestamp: datetime
+    anomaly_type: str
+    details: str
     
 # ---- CREATE TABLES ----
 def create_db_and_tables():
@@ -36,7 +44,8 @@ def create_db_and_tables():
 @app.on_event("startup")
 def on_startup():
     create_db_and_tables()
-    
+
+# Checks for anomalies in altitude or speed   
 def check_anomaly(previous, current):
     altitude_drop = 3000
     recorded_drop = previous.altitude_ft - current.altitude_ft
@@ -62,17 +71,28 @@ def ingest_telemetry(data: InputTelemetry):
             StoredTelemetry.icao == data.icao
         ).order_by(StoredTelemetry.timestamp.desc())).first()
         
-        if prev_icao is None:
-            pass
-        else:
-            is_anomaly = check_anomaly(prev_icao, db_telemetry)
-        
+            
         session.add(db_telemetry)
         session.commit()
         session.refresh(db_telemetry)
         
+        if prev_icao is None:
+            pass
+        else:
+            is_anomaly = check_anomaly(prev_icao, db_telemetry)
+            if is_anomaly:
+                alert = Alert(
+                    icao = data.icao,
+                    timestamp = data.timestamp,
+                    anomaly_type = "Altitude drop",
+                    details = f"Altitude dropped from {prev_icao.altitude_ft}ft to {data.altitude_ft}ft"
+                )
+                session.add(alert)
+                session.commit()
+        
         return db_telemetry
 
+            
 # Display all telemetry
 @app.get("/telemetry", response_model=list[StoredTelemetry])
 def get_all_telemetry():
@@ -81,7 +101,7 @@ def get_all_telemetry():
         results = session.exec(statement).all()
         return results
 
-# Filtered by ICAO    
+# GET route filtered by ICAO    
 @app.get("/telemetry/{icao}", response_model=list[StoredTelemetry])
 def get_icao_telemetry(icao: str):
     with Session(engine) as session:
@@ -91,7 +111,7 @@ def get_icao_telemetry(icao: str):
         results = session.exec(statement).all()
         return results
 
-# Sorted by altitude
+# GET route sorted by altitude
 @app.get("/telemetry/altitude/", response_model=list[StoredTelemetry])
 def filtered_altitudes(min_altitude: int | None = None, max_altitude: int | None = None):
     with Session(engine) as session:
@@ -109,7 +129,7 @@ def filtered_altitudes(min_altitude: int | None = None, max_altitude: int | None
         results = session.exec(statement).all()
         return results
     
-# Sorted by speed
+# GET route sorted by speed
 @app.get("/telemetry/speed/", response_model=list[StoredTelemetry])
 def filtered_speed(min_speed: int | None = None, max_speed: int | None = None):
     with Session(engine) as session:
@@ -126,4 +146,12 @@ def filtered_speed(min_speed: int | None = None, max_speed: int | None = None):
             )
         
         results = session.exec(statement).all()
+        return results
+
+# GET route for alerts / anomalies
+@app.get("/telemetry/alert/", response_model=list[Alert])
+def get_alert():
+    with Session(engine) as session:
+        alert = select(Alert)
+        results = session.exec(alert).all()  
         return results
