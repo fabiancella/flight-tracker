@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, WebSocketException
 from datetime import datetime
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, create_engine, Session, select
@@ -72,9 +72,12 @@ def ingest_telemetry(data: InputTelemetry):
         ).order_by(StoredTelemetry.timestamp.desc())).first()
         
             
-        session.add(db_telemetry)
-        session.commit()
-        session.refresh(db_telemetry)
+        try:
+            session.add(db_telemetry)
+            session.commit()
+            session.refresh(db_telemetry)
+        except Exception:
+            raise HTTPException(status_code=500, detail="Could not save telemetry")
         
         if prev_icao is None:
             pass
@@ -87,11 +90,13 @@ def ingest_telemetry(data: InputTelemetry):
                     anomaly_type = "Altitude drop",
                     details = f"Altitude dropped from {prev_icao.altitude_ft}ft to {data.altitude_ft}ft"
                 )
-                session.add(alert)
-                session.commit()
-        
+                try:
+                    session.add(alert)
+                    session.commit()
+                except Exception:
+                    raise HTTPException(status_code=500, detail="Could not save alert")
+                
         return db_telemetry
-
             
 # Display all telemetry
 @app.get("/telemetry", response_model=list[StoredTelemetry])
@@ -109,12 +114,17 @@ def get_icao_telemetry(icao: str):
             StoredTelemetry.icao == icao
         )
         results = session.exec(statement).all()
-        return results
+        if not results:
+            raise HTTPException(status_code=404, detail="ICAO not found")
+        return results    
 
 # GET route sorted by altitude
 @app.get("/telemetry/altitude/", response_model=list[StoredTelemetry])
 def filtered_altitudes(min_altitude: int | None = None, max_altitude: int | None = None):
     with Session(engine) as session:
+        if min_altitude is not None and max_altitude is not None and min_altitude > max_altitude:
+            raise HTTPException(status_code=400, detail="Invalid request, minimum altitude greater than maximum altitude")
+        
         statement = select(StoredTelemetry)
         
         if min_altitude is not None:
@@ -126,13 +136,19 @@ def filtered_altitudes(min_altitude: int | None = None, max_altitude: int | None
             statement = statement.where(
                 StoredTelemetry.altitude_ft <= max_altitude
             )
+        
         results = session.exec(statement).all()
+        if not results:
+            raise HTTPException(status_code=404, detail="No flight found within range")    
         return results
     
 # GET route sorted by speed
 @app.get("/telemetry/speed/", response_model=list[StoredTelemetry])
 def filtered_speed(min_speed: int | None = None, max_speed: int | None = None):
     with Session(engine) as session:
+        if min_speed is not None and max_speed is not None and min_speed > max_speed:
+            raise HTTPException(status_code=400, detail="Invalid request, minimum speed is greater than maximum speed")
+        
         statement = select(StoredTelemetry)
         
         if min_speed is not None:
@@ -146,6 +162,8 @@ def filtered_speed(min_speed: int | None = None, max_speed: int | None = None):
             )
         
         results = session.exec(statement).all()
+        if not results:
+            raise HTTPException(status_code=404, detail="No flight found within range")
         return results
 
 # GET route for alerts / anomalies
@@ -154,4 +172,9 @@ def get_alert():
     with Session(engine) as session:
         alert = select(Alert)
         results = session.exec(alert).all()  
+        if not results:
+            raise HTTPException(status_code=404, detail="No alerts found")
         return results
+    
+    
+#2275 steps
