@@ -17,8 +17,8 @@ class StoredTelemetry(SQLModel, table=True):
     timestamp: datetime
     latitude: float
     longitude: float
-    altitude_ft: int
-    groundspeed_kt: int
+    altitude_ft: float
+    groundspeed_kt: float
 
 # Class for inputting telemetry
 class InputTelemetry(SQLModel):
@@ -26,8 +26,8 @@ class InputTelemetry(SQLModel):
     timestamp: datetime
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
-    altitude_ft: int = Field(ge=0)
-    groundspeed_kt: int = Field(ge=0, le=700)
+    altitude_ft: float = Field(ge=0)
+    groundspeed_kt: float = Field(ge=0, le=700)
 
 # Model to send alert data to database
 class Alert(SQLModel, table=True):
@@ -45,7 +45,7 @@ def create_db_and_tables():
 def on_startup():
     create_db_and_tables()
 
-# Checks for anomalies in altitude or speed   
+# Checks for anomalies in altitude  
 def check_anomaly(previous, current):
     altitude_drop = 3000
     recorded_drop = previous.altitude_ft - current.altitude_ft
@@ -100,14 +100,26 @@ def ingest_telemetry(data: InputTelemetry):
             
 # Display all telemetry
 @app.get("/telemetry", response_model=list[StoredTelemetry])
-def get_all_telemetry():
+def get_all_telemetry(offset: int = 0, limit: int = 10, sort: str = "desc"):
     with Session(engine) as session:
-        statement = select(StoredTelemetry)
+        if sort != "asc" and sort != "desc":
+            raise HTTPException(status_code=400, detail="Invalid request")
+         
+        if sort == "asc":
+            ordering = StoredTelemetry.timestamp
+            statement = select(StoredTelemetry
+            ).order_by(ordering).offset(offset).limit(limit)
+        
+        elif sort == "desc":
+            ordering = StoredTelemetry.timestamp.desc()
+            statement = select(StoredTelemetry
+            ).order_by(ordering).offset(offset).limit(limit)
+        
         results = session.exec(statement).all()
         return results
 
 # GET route filtered by ICAO    
-@app.get("/telemetry/{icao}", response_model=list[StoredTelemetry])
+@app.get("/telemetry/icao/{icao}", response_model=list[StoredTelemetry])
 def get_icao_telemetry(icao: str):
     with Session(engine) as session:
         statement = select(StoredTelemetry).where(
@@ -177,4 +189,3 @@ def get_alert():
         return results
     
     
-#2275 steps
