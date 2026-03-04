@@ -132,7 +132,7 @@ def get_icao_telemetry(icao: str):
 
 # GET route sorted by altitude
 @app.get("/telemetry/altitude/", response_model=list[StoredTelemetry])
-def filtered_altitudes(min_altitude: int | None = None, max_altitude: int | None = None):
+def filtered_altitudes(min_altitude: Optional[int], max_altitude: Optional[int]):
     with Session(engine) as session:
         if min_altitude is not None and max_altitude is not None and min_altitude > max_altitude:
             raise HTTPException(status_code=400, detail="Invalid request, minimum altitude greater than maximum altitude")
@@ -156,7 +156,7 @@ def filtered_altitudes(min_altitude: int | None = None, max_altitude: int | None
     
 # GET route sorted by speed
 @app.get("/telemetry/speed/", response_model=list[StoredTelemetry])
-def filtered_speed(min_speed: int | None = None, max_speed: int | None = None):
+def filtered_speed(min_speed: Optional[int], max_speed: Optional[int]):
     with Session(engine) as session:
         if min_speed is not None and max_speed is not None and min_speed > max_speed:
             raise HTTPException(status_code=400, detail="Invalid request, minimum speed is greater than maximum speed")
