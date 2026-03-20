@@ -12,7 +12,7 @@ PARAMS = {
 response = requests.get(OPENSKY_URL, params=PARAMS)
 data = response.json()
 
-API_URL = "http://100.48.102.102:8000/telemetry"
+API_URL = "http://127.0.0.1:8000/telemetry"
 
 for state in data["states"]:
     if state[7] is None or state[9] is None:
