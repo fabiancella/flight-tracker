@@ -14,6 +14,7 @@ engine = create_engine(DATABASE_URL, echo=True)
 class StoredTelemetry(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     icao: str 
+    callsign: str
     timestamp: datetime
     latitude: float
     longitude: float
@@ -23,6 +24,7 @@ class StoredTelemetry(SQLModel, table=True):
 # Class for inputting telemetry
 class InputTelemetry(SQLModel):
     icao: str
+    callsign: str
     timestamp: datetime
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
@@ -32,6 +34,7 @@ class InputTelemetry(SQLModel):
 # Model to send alert data to database
 class Alert(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
+    callsign: str
     icao: str
     timestamp: datetime
     anomaly_type: str
@@ -61,6 +64,7 @@ def ingest_telemetry(data: InputTelemetry):
     with Session(engine) as session:
         db_telemetry = StoredTelemetry(
             icao = data.icao,
+            callsign = data.callsign,
             timestamp = data.timestamp,
             latitude = data.latitude,
             longitude = data.longitude,
@@ -86,6 +90,7 @@ def ingest_telemetry(data: InputTelemetry):
             if is_anomaly:
                 alert = Alert(
                     icao = data.icao,
+                    callsign = data.callsign,
                     timestamp = data.timestamp,
                     anomaly_type = "Altitude drop",
                     details = f"Altitude dropped from {prev_icao.altitude_ft}ft to {data.altitude_ft}ft"
@@ -98,7 +103,7 @@ def ingest_telemetry(data: InputTelemetry):
                 
         return db_telemetry
             
-# Display all telemetry
+# Sort telemetry by timestamp
 @app.get("/telemetry", response_model=list[StoredTelemetry])
 def get_all_telemetry(offset: int = 0, limit: int = 10, sort: str = "desc"):
     with Session(engine) as session:
