@@ -134,6 +134,19 @@ def get_icao_telemetry(icao: str):
         if not results:
             raise HTTPException(status_code=404, detail="ICAO not found")
         return results    
+    
+# GET route filtered by callsign
+@app.get("/telemetry/callsign/{callsign}", response_model=list[StoredTelemetry])
+def get_callsign_telemetry(callsign: str):
+    with Session(engine) as session:
+        statement = select(StoredTelemetry).where(
+            StoredTelemetry.callsign == callsign
+        )
+        results = session.exec(statement).all()
+        if not results:
+            raise HTTPException(status_code=404, detail="Callsign not found")
+        return results
+ 
 
 # GET route sorted by altitude
 @app.get("/telemetry/altitude/", response_model=list[StoredTelemetry])
