@@ -9,7 +9,7 @@
 **Features**
 * Ingest and store aircraft telemetry data
 * Retrieve all telemetry records
-* Filter by ICAO, altitude range, and speed range
+* Filter by ICAO, Callsign, altitude range, and speed range
 * Automatic anomaly detection for sudden altitude drops
 * Alert storage and retrieval for flagged anomalies
 * Input validation and error handling

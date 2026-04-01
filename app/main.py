@@ -2,11 +2,14 @@ from fastapi import FastAPI, HTTPException, WebSocketException
 from datetime import datetime
 from typing import Optional, List
 from sqlmodel import SQLModel, Field, create_engine, Session, select
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 app = FastAPI()
 
 # ---- DATABASE SETUP ----
-DATABASE_URL = "sqlite:///app/flight.db"
+DATABASE_URL = "postgresql://postgres:{os.getenv('DB_PASSWORD')}@flight-tracker-db.ce168m4ccijd.us-east-1.rds.amazonaws.com:5432/postgres"
 
 engine = create_engine(DATABASE_URL, echo=True)
 
@@ -205,5 +208,9 @@ def get_alert():
         if not results:
             raise HTTPException(status_code=404, detail="No alerts found")
         return results
-    
-    
+
+# check server status  
+@app.get("/health")
+def health_check():
+    health = {"status": "ok"}
+    return health
