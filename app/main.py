@@ -9,7 +9,7 @@ load_dotenv()
 app = FastAPI()
 
 # ---- DATABASE SETUP ----
-DATABASE_URL = "postgresql://postgres:{os.getenv('DB_PASSWORD')}@flight-tracker-db.ce168m4ccijd.us-east-1.rds.amazonaws.com:5432/postgres"
+DATABASE_URL = f"postgresql://postgres:{os.getenv('DB_PASSWORD')}@flight-tracker-db.ce168m4ccijd.us-east-1.rds.amazonaws.com:5432/postgres?sslmode=require"
 
 engine = create_engine(DATABASE_URL, echo=True)
 
