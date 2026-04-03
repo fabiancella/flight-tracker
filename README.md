@@ -2,13 +2,14 @@
 automatically detects anomalous altitude drops.
 
 **Architecture**
-A local cron job runs every 5 minutes, pulling live ADS-B flight data from the OpenSky Network API and posting it to the deployed API. The API runs on an AWS EC2 instance and persists data to a PostgreSQL database hosted on AWS RDS. OpenSky blocks AWS IP ranges, so the feeder runs locally and posts to the public EC2 endpoint rather than running on the server itself.
+A local cron job runs every 5 minutes, pulling live ADS-B flight data from the OpenSky Network API and posting it to the deployed API. The API runs on an AWS EC2 instance and persists data to a PostgreSQL database hosted on AWS RDS. OpenSky blocks AWS IP ranges, so the feeder runs locally and posts to the public EC2 endpoint rather than running on the server itself. Frontend calls EC2 API directly from the browser, showing a map with visible planes.
 
 **Tech Stack** 
 * Python
 * FastAPI
 * SQLModel
 * PostgreSQL (AWS RDS)
+* Leaflet.js
 
 **Features**
 * Ingest and store aircraft telemetry data
