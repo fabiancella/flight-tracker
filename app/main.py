@@ -4,12 +4,21 @@ from typing import Optional, List
 from sqlmodel import SQLModel, Field, create_engine, Session, select
 import os
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 app = FastAPI()
 
+app.add_middlware(
+    CORSMiddleware,
+    allow_origins = ["*"],
+    allow_methods = ["*"],
+    allow_headers = ["*"],
+)
+
 # ---- DATABASE SETUP ----
 DATABASE_URL = f"postgresql://postgres:{os.getenv('DB_PASSWORD')}@flight-tracker-db.ce168m4ccijd.us-east-1.rds.amazonaws.com:5432/postgres?sslmode=require"
+# ---- DATABASE SETUP ----
 
 engine = create_engine(DATABASE_URL, echo=True)
 
