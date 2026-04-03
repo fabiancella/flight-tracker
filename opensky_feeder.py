@@ -25,7 +25,7 @@ for state in data["states"]:
         "longitude" : state[5],
         "latitude" : state[6],
         "altitude_ft" : state[7] * 3.281,
-        "groundspeed_kt" : state[9] * 1.944,
+        "groundspeed_kt" : state[9] * 1.944,  
     }
     
     response = requests.post(API_URL, json=payload)
