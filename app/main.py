@@ -9,7 +9,8 @@ from fastapi.middleware.cors import CORSMiddleware
 load_dotenv()
 app = FastAPI()
 
-app.add_middlware(
+
+app.add_middleware(
     CORSMiddleware,
     allow_origins = ["*"],
     allow_methods = ["*"],
