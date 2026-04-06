@@ -84,7 +84,8 @@ def ingest_telemetry(data: InputTelemetry):
             latitude = data.latitude,
             longitude = data.longitude,
             altitude_ft = data.altitude_ft,
-            groundspeed_kt = data.groundspeed_kt
+            groundspeed_kt = data.groundspeed_kt,
+            heading = data.heading
         )
         prev_icao = session.exec(select(StoredTelemetry).where(
             StoredTelemetry.icao == data.icao

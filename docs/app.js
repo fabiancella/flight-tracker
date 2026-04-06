@@ -36,7 +36,13 @@ async function fetchTelemetry(){
             });
 
             // Plane physical marker    
-            const plane_marker = L.marker([planes.latitude, planes.longitude], {icon: planeIcon}).addTo(markerLayer);
+            const plane_marker = L.marker([planes.latitude, planes.longitude], {
+                icon: planeIcon,
+                rotationAngle: planes.heading,
+                rotationOrigin: 'center center'
+            }).addTo(markerLayer);
+
+            console.log(planes.heading)
         
             // Plane information popup
             plane_marker.bindPopup(`Callsign: ${planes.callsign}<br>Altitude: ${Math.round(planes.altitude_ft)} ft<br>Ground Speed: ${Math.round(planes.groundspeed_kt)} kts<br>Time: ${time}`);
