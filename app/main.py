@@ -33,6 +33,7 @@ class StoredTelemetry(SQLModel, table=True):
     longitude: float
     altitude_ft: float
     groundspeed_kt: float
+    heading: float
 
 # Class for inputting telemetry
 class InputTelemetry(SQLModel):
@@ -43,6 +44,7 @@ class InputTelemetry(SQLModel):
     longitude: float = Field(ge=-180, le=180)
     altitude_ft: float = Field(ge=0)
     groundspeed_kt: float = Field(ge=0, le=700)
+    heading: float
 
 # Model to send alert data to database
 class Alert(SQLModel, table=True):
