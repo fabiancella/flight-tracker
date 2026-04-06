@@ -157,7 +157,8 @@ def get_callsign_telemetry(callsign: str):
     with Session(engine) as session:
         statement = select(StoredTelemetry).where(
             StoredTelemetry.callsign == callsign
-        )
+        ).order_by(StoredTelemetry.timestamp.desc())
+        
         results = session.exec(statement).all()
         if not results:
             raise HTTPException(status_code=404, detail="Callsign not found")

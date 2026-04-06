@@ -31,5 +31,4 @@ for state in data["states"]:
     
     response = requests.post(API_URL, json=payload)
     
-    print(data["states"][0])
     
