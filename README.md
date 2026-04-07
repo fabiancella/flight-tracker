@@ -16,6 +16,7 @@ A local cron job runs every 5 minutes, pulling live ADS-B flight data from the O
 * FastAPI
 * SQLModel
 * PostgreSQL (AWS RDS)
+* AWS EC2
 * Leaflet.js
 
 **Features**
@@ -25,6 +26,9 @@ A local cron job runs every 5 minutes, pulling live ADS-B flight data from the O
 * Automatic anomaly detection for sudden altitude drops
 * Alert storage and retrieval for flagged anomalies
 * Input validation and error handling
+* Interactive map with live flight positions and heading-based plane rotation
+* Callsign search to find specific flights
+* Adjustable flight count display
 
 **Setup**
 ```bash
