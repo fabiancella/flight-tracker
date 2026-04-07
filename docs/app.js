@@ -14,7 +14,8 @@ const planeIcon = L.icon({
 
 async function fetchTelemetry(){
     try{
-        const response = await fetch ("http://100.48.102.102:8000/telemetry")
+        const limit = document.getElementById('flight-limit').value;
+        const response = await fetch (`http://100.48.102.102:8000/telemetry?limit=${limit}`)
 
         if(!response.ok){
             throw new Error("Couldn't reach data")
@@ -68,26 +69,6 @@ async function fetchCallsign(){
         console.log(data)
 
         markerLayer.clearLayers();
-
-    //     for (const planes of data){
-    //         const time = new Date(planes.timestamp + 'Z').toLocaleTimeString('en-US', {
-    //             timeZone : 'America/New_York',
-    //             month: '2-digit',
-    //             day: '2-digit', 
-    //             year: 'numeric',
-    //             hour: '2-digit',
-    //             minute: '2-digit',
-    //             hour12: false
-    //         });
-
-    //         const plane_marker = L.marker([planes.latitude, planes.longitude], {
-    //             icon: planeIcon,
-    //             rotationAngle: planes.heading,
-    //             rotationOrigin: 'center center'
-    //         }).addTo(markerLayer);
-
-    //         plane_marker.bindPopup(`Callsign: ${planes.callsign}<br>Altitude: ${Math.round(planes.altitude_ft)} ft<br>Ground Speed: ${Math.round(planes.groundspeed_kt)} kts<br>Time: ${time}`);
-    // }
         
         const latest = data[0]
 
@@ -116,5 +97,8 @@ async function fetchCallsign(){
     }
 }
 document.getElementById('search-btn').addEventListener('click', fetchCallsign);
-fetchTelemetry()
-setInterval(fetchTelemetry, 300000)
+document.getElementById('flight-limit').addEventListener('change', fetchTelemetry);
+fetchTelemetry();
+setInterval(fetchTelemetry, 300000);
+
+
