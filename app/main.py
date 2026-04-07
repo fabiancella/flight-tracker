@@ -34,7 +34,6 @@ class StoredTelemetry(SQLModel, table=True):
     altitude_ft: float
     groundspeed_kt: float
     heading: float
-    category: int
 
 # Class for inputting telemetry
 class InputTelemetry(SQLModel):
@@ -46,7 +45,6 @@ class InputTelemetry(SQLModel):
     altitude_ft: float = Field(ge=0)
     groundspeed_kt: float = Field(ge=0, le=700)
     heading: float
-    category: int
 
 # Model to send alert data to database
 class Alert(SQLModel, table=True):
@@ -88,7 +86,6 @@ def ingest_telemetry(data: InputTelemetry):
             altitude_ft = data.altitude_ft,
             groundspeed_kt = data.groundspeed_kt,
             heading = data.heading,
-            category = data.category
         )
         prev_icao = session.exec(select(StoredTelemetry).where(
             StoredTelemetry.icao == data.icao
