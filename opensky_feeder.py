@@ -27,9 +27,10 @@ for state in data["states"]:
         "altitude_ft" : state[7] * 3.281,
         "groundspeed_kt" : state[9] * 1.944,  
         "heading" : state[10],
-        "category": state[17] if len(state) > 17 else None
     }
     
     response = requests.post(API_URL, json=payload)
+
+    print(payload)
     
     
