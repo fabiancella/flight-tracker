@@ -59,7 +59,7 @@ async function fetchTelemetry(){
 async function fetchCallsign(){
     try{
         const callsign = document.getElementById('callsign-input').value;
-        const response = await fetch (`http://100.48.102.102:8000/telemetry/callsign/${callsign}`)
+        const response = await fetch (`https://api.aeroping.net/telemetry/callsign/${callsign}`)
 
         if(!response.ok){
             throw new Error("Callsign not found")
