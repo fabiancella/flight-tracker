@@ -15,7 +15,7 @@ const planeIcon = L.icon({
 async function fetchTelemetry(){
     try{
         const limit = document.getElementById('flight-limit').value;
-        const response = await fetch (`http://100.48.102.102:8000/telemetry?limit=${limit}`)
+        const response = await fetch (`https://api.aeroping.net/telemetry?limit=${limit}`)
 
         if(!response.ok){
             throw new Error("Couldn't reach data")
