@@ -28,12 +28,25 @@ def normalize_plane(plane, timestamp):
 
 AIRPLANES_LIVE_URL = "https://api.airplanes.live/v2/point/27.6648/-81.5158/250"
 
-response = requests.get(AIRPLANES_LIVE_URL)
+response = requests.get(AIRPLANES_LIVE_URL, timeout=15)
+
+if not response.ok:
+    raise RuntimeError(
+        f'Airplane.live returned {response.status_code}: {response.text} '
+    )
+
 data = response.json()
+
+planes = data.get("ac")
+
+if planes is None:
+    raise RuntimeError(
+        f'Unexpected issue {data}'
+    )
 
 API_URL = "https://api.aeroping.net/telemetry"
 
-for plane in data["ac"]:
+for plane in planes:
     payload = normalize_plane(plane, data["now"])
     
     if payload is None:
