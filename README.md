@@ -8,7 +8,7 @@ https://fabiancella.github.io/flight-tracker/
 http://api.aeroping.net/telemetry
 
 **Architecture** -
-CURRENT USING OPENSKY NETWORK
+CURRENTLY USING OPENSKY NETWORK
 OpenSky blocks AWS IP ranges, so the feeder currently runs locally and posts telemetry data to the deployed API over HTTPS. The API is hosted on an AWS EC2 instance behind Nginx, exposed through `https://api.aeroping.net`, and persists data to a PostgreSQL database hosted on AWS RDS. The frontend is hosted on GitHub Pages and calls the HTTPS API domain from the browser to display aircraft on an interactive map.
 
 **Tech Stack** 
