@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 import requests
 
 def normalize_plane(plane, timestamp):
-    if plane.get('lon') is None or plane.get('lat') is None or plane.get('gs') is None or plane.get('track') is None or plane.get('hex') is None or plane.get('alt_baro') is None:
+    if plane.get('lon') is None or plane.get('lat') is None or plane.get('gs') is None or plane.get('true_heading') is None or plane.get('hex') is None or plane.get('alt_baro') is None:
         return None
     
     callsign = plane.get('flight')   
@@ -21,7 +21,7 @@ def normalize_plane(plane, timestamp):
         "latitude" : plane["lat"],
         "altitude_ft" : altitude,
         "groundspeed_kt" : plane["gs"],  
-        "heading" : plane["track"],
+        "heading" : plane["true_heading"],
     }
     
     return clean_data
@@ -40,4 +40,5 @@ for plane in data["ac"]:
         continue
     
     response = requests.post(API_URL, json=payload)
-    print(payload)
+
+print("worked")
