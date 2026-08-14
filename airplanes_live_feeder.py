@@ -55,3 +55,5 @@ for plane in planes:
     response = requests.post(API_URL, json=payload)
 
 print("worked")
+
+auter_test = "this is a test for autter"
