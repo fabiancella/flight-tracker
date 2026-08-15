@@ -1,7 +1,7 @@
 **Flight Telemetry API** — A REST API built with FastAPI and PostgreSQL that ingests real-time aircraft telemetry data, supports filtering by ICAO, altitude, and speed, and 
 automatically detects anomalous altitude drops.
 
-**Frontend Link** -
+**Frontend Link:**
 https://fabiancella.github.io/flight-tracker/
 
 **API Base URL** - 
