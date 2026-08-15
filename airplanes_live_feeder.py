@@ -56,4 +56,4 @@ for plane in planes:
 
 print("worked")
 
-auter_test = "this is a test for autter"
+auter_test = "this is a test for autter!"
