@@ -9,7 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 load_dotenv()
 app = FastAPI()
 
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -21,7 +20,7 @@ app.add_middleware(
 )
 
 # ---- DATABASE SETUP ----
-DATABASE_URL = f"postgresql://postgres:{os.getenv('DB_PASSWORD')}@flight-tracker-db.ce168m4ccijd.us-east-1.rds.amazonaws.com:5432/postgres?sslmode=require"
+DATABASE_URL = f"postgresql://neondb_owner:{os.getenv('DB_PASSWORD')}@ep-young-moon-b54uf40w-pooler.c-7.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 # ---- DATABASE SETUP ----
 
 engine = create_engine(DATABASE_URL, echo=True)
@@ -231,3 +230,7 @@ def get_alert():
 def health_check():
     health = {"status": "ok"}
     return health
+
+@app.get('/test-error')
+def test_error():
+    raise RuntimeError('Testing Autter')
